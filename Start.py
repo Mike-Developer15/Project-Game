@@ -1,3 +1,4 @@
+from sqlite3 import connect
 import pygame
 import Functions
 
@@ -14,48 +15,39 @@ connected = True
 width = screen.get_width()
 height = screen.get_height()
 menu = True
+singlePlayer = Functions.Button("red", "grey", width/2,height/2,140,40, "Single Player")
+serverSide = Functions.Button("red", "grey", width/2,height/2 - 60,140,40, "Start Server")
+clientSide = Functions.Button("red", "grey", width/2,height/2 - 120,140,40, "Join Game")
+
 while menu:
     # Process player inputs.\
     mouse = pygame.mouse.get_pos()
-    button1_logic = width/2 <= mouse[0] <= width/2+140 and height/2 <= mouse[1] <= height/2+40
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             raise SystemExit
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if button1_logic:
+            #starts single player
+            if singlePlayer.IsOver(mouse):
                 connected = False
+                menu = False
+            #starts Server
+            if serverSide.IsOver(mouse):
+                server = True
+                menu = False
+            #Joins Server
+            if clientSide.IsOver(mouse):
                 menu = False
 
 
     screen.fill("black")  # Fill the display with a solid color
-    keys = pygame. key.get_pressed()
+    keys = pygame. key.get_pressed()   
 
+    # Render the graphics here.  
+    singlePlayer.Draw(screen, mouse)
+    serverSide.Draw(screen, mouse)
+    clientSide.Draw(screen, mouse)
     
-
-    if button1_logic: 
-        pygame.draw.rect(screen,"white",[width/2,height/2,140,40]) 
-          
-    else: 
-        pygame.draw.rect(screen,"red",[width/2,height/2,140,40]) 
-
-    #starts the server side
-    if keys[pygame.K_s]:
-        pygame.draw.rect(screen,"green",[width/2,height/2,140,40])
-        server = True
-        menu = False
-    #starts the client side 
-    if keys[pygame.K_c]:
-        pygame.draw.rect(screen,"blue",[width/2,height/2,140,40])
-        menu = False
-    #starts single player
-    if keys[pygame.K_q]:
-        connected = False
-        menu = False
-    # Render the graphics here.
-    # ...
-        
-
 
     pygame.display.flip()  # Refresh on-screen display
     clock.tick(60)         # wait until next frame (at 60 FPS)
@@ -75,7 +67,8 @@ lSidePlat = pygame.Rect(screen.get_width()/4 - 200, screen.get_height() - 400, 2
 
 
 #online player
-online = Functions.ConnectionHelper(server);
+if connected:
+    online = Functions.ConnectionHelper(server);
 
 
 #Connects to the other player is appliciable
